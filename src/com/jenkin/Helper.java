@@ -14,7 +14,7 @@ public class Helper {
 
 	public static void main(String[] args) {
 
-		String path = "D:\\MyScreen\\Project\\MyScreen_Child\\app\\src\\main\\java\\com\\uestc\\myscreen_child\\presenter"; // 要遍历的路径
+		String path = "D:\\MyScreen\\Project\\MyScreen_Server\\src\\com\\uestc\\business\\dao"; // 要遍历的路径
 		File file = new File(path); // 获取其file对象
 		readFiles(file);
 
