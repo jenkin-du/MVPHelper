@@ -2,16 +2,19 @@ package com.jenkin;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Helper {
 
 	public static void main(String[] args) {
 
-		String path = "E:\\Java\\JavaWeb\\MVPHepler\\src\\test\\authentication"; // 要遍历的路径
+		String path = "D:\\MyScreen\\Project\\MyScreen_Child\\app\\src\\main\\java\\com\\uestc\\myscreen_child\\presenter"; // 要遍历的路径
 		File file = new File(path); // 获取其file对象
 		readFiles(file);
 
@@ -22,7 +25,7 @@ public class Helper {
 		for (File f : fs) {
 			if (f.isDirectory()) // 若是目录，则递归打印该目录下的文件
 				readFiles(f);
-			if (f.isFile()) // 若是文件，直接打印
+			if (f.isFile()) 
 				if (!f.getParent().contains("impl")) {
 					generateImpl(f);
 				}
@@ -44,7 +47,9 @@ public class Helper {
 		BufferedWriter bufferWriter=null;
 		if (!implFile.exists()) {
 			try {
-				implFolder.mkdirs();
+				if(!implFolder.exists()) {
+					implFolder.mkdirs();
+				}
 				implFile.createNewFile();
 
 				reader = new FileReader(file);
@@ -68,6 +73,19 @@ public class Helper {
 					packageLine = packageLine.replace("package", "");
 					String importLine = "import" + packageLine + "." + className + ";";
 
+					Date date=new  Date();
+					SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd");
+					String dateStr=sdf.format(date);
+					String statement="/**\r\n" + 
+									" * <pre>\r\n" + 
+									" *     author : jenkin\r\n" + 
+									" *     e-mail : jekin-du@foxmail.com\r\n" + 
+									" *     time   : "+dateStr+"\r\n" + 
+									" *     desc   :\r\n" + 
+									" *     version: 1.0\r\n" + 
+									" * </pre>\r\n" + 
+									" */\r\n";
+					
 					//类体
 					String classBody = "public class "+className+"Impl implements "+className+"{\r\n \r\n}";
 					
@@ -81,6 +99,7 @@ public class Helper {
 					bufferWriter.write(importLine);
 					bufferWriter.write("\r\n");
 					bufferWriter.write("\r\n");
+					bufferWriter.write(statement);
 					bufferWriter.write(classBody);
 					
 					bufferWriter.flush();
@@ -101,6 +120,42 @@ public class Helper {
 
 			}
 		}
+	}
+	
+	/**
+	 * 替换文本文件中的 非法字符串
+	 * 
+	 * @param path
+	 * @throws IOException
+	 */
+	public static void replacTextContent(File file) throws IOException {
+
+		// 原有的内容
+		String srcStr = "class";
+		// 要替换的内容
+		String replaceStr = "interface";
+		// 读
+		FileReader in = new FileReader(file);
+		BufferedReader bufIn = new BufferedReader(in);
+		// 内存流, 作为临时流
+		CharArrayWriter tempStream = new CharArrayWriter();
+		// 替换
+		String line = null;
+		while ((line = bufIn.readLine()) != null) {
+			// 替换每行中, 符合条件的字符串
+			line = line.replaceAll(srcStr, replaceStr);
+			// 将该行写入内存
+			tempStream.write(line);
+			// 添加换行符
+			tempStream.append(System.getProperty("line.separator"));
+		}
+		// 关闭 输入流
+		bufIn.close();
+		// 将内存中的流 写入 文件
+		FileWriter out = new FileWriter(file);
+		tempStream.writeTo(out);
+		out.close();
+
 	}
 
 }
